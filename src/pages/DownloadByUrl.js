@@ -13,7 +13,8 @@ const DownloadByUrl = () => {
     const [quality, setQuality] = useState('');
 
 
-    const backendUrl = "http://localhost:5000"; // Ensure your backend is running
+    // const backendUrl = "http://localhost:5000"; // Ensure your backend is running
+    const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     // 🔍 Fetch Video Info by URL
     const handleFetchVideo = async () => {

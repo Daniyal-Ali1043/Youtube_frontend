@@ -9,7 +9,8 @@ const PlayPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const backendUrl = "http://localhost:5000"; // Adjust as needed
+  // const backendUrl = "http://localhost:5000"; // Adjust as needed
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
   // 🔍 Search Videos from Backend
   const handleSearch = async () => {
@@ -17,7 +18,7 @@ const PlayPage = () => {
 
     try {
       setLoading(true);
-      const response = await axios.get(`${backendUrl}/search`, {
+      const response = await axios.get(`${backendUrl}/api/search`, {
         params: { query },
       });
       setVideos(response.data);

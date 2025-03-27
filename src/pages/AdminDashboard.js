@@ -24,6 +24,7 @@ export default function AdminDashboard() {
         other: 0,
     });
     const [errorLogs, setErrorLogs] = useState([]);
+    const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const fetchErrorSearches = async () => {
         try {
@@ -38,7 +39,7 @@ export default function AdminDashboard() {
     // Fetch format distribution count (MP3, MP4)
     const fetchFormatDistribution = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/download/count/formats");
+            const response = await axios.get(`${backendUrl}/download/count/formats`);
             const { mp3, mp4 } = response.data;
             setMp3Count(mp3);
             setMp4Count(mp4);
@@ -51,7 +52,7 @@ export default function AdminDashboard() {
     // Fetch Quality Distribution (720p, 1080p, etc.)
     const fetchQualityDistribution = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/download/count/quality");
+            const response = await axios.get(`${backendUrl}/download/count/quality`);
             setQualityData(response.data);
         } catch (error) {
             console.error("❌ Error fetching quality distribution:", error.message);
@@ -68,7 +69,7 @@ export default function AdminDashboard() {
     // Fetch total download count
     const fetchDownloadCount = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/download/count");
+            const response = await axios.get(`${backendUrl}/download/count`);
             setTotalDownloads(response.data.totalDownloads);
         } catch (error) {
             console.error("❌ Error fetching download count:", error.message);
@@ -78,7 +79,7 @@ export default function AdminDashboard() {
 
     const fetchAllDownloads = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/download/all");
+            const response = await axios.get(`${backendUrl}/download/all`);
             setDownloadList(response.data);
             setShowDownloads(true);
         } catch (error) {
@@ -90,7 +91,7 @@ export default function AdminDashboard() {
     // Fetch total search count
     const fetchSearchCount = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/search/count");
+            const response = await axios.get(`${backendUrl}/api/search/count`);
             setTotalSearches(response.data.totalSearches);
         } catch (error) {
             console.error("❌ Error fetching search count:", error.message);
@@ -100,7 +101,7 @@ export default function AdminDashboard() {
 
     const fetchAllSearches = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/search/all");
+            const response = await axios.get(`${backendUrl}/api/search/all`);
             setSearchList(response.data);
             setShowSearches(true);
         } catch (error) {
@@ -118,7 +119,7 @@ export default function AdminDashboard() {
     // Fetch top search queries
     const fetchTopSearchQueries = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/search/top");
+            const response = await axios.get(`${backendUrl}/api/search/top`);
             console.log("✅ Fetched Data:", response.data);
             setTopSearchQueries([...response.data]); // Ensure new reference
         } catch (error) {

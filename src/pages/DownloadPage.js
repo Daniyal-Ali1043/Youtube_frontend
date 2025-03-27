@@ -12,7 +12,9 @@ const DownloadPage = () => {
   const [format, setFormat] = useState("mp3");
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [quality, setQuality] = useState("");
-  const backendUrl = "http://localhost:5000";
+  // const backendUrl = "http://localhost:5000";
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
 
   // 🔍 Search Videos from Backend
   const handleSearch = async () => {
