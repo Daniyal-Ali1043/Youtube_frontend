@@ -21,12 +21,12 @@ const HomePage = () => {
 
       {/* Interactive Buttons */}
       <div className="mt-16 flex flex-wrap gap-8 justify-center">
-        <button
+        {/* <button
           onClick={() => navigate("/playsearch-videos")}
           className="bg-red-500 px-8 py-4 rounded-full text-xl font-semibold hover:bg-red-600 transform hover:scale-105 transition duration-300 shadow-lg"
         >
           🔍 Search and Play Videos
-        </button>
+        </button> */}
 
         <button
           onClick={() => navigate("/download-link")}

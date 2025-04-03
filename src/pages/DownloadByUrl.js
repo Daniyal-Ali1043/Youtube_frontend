@@ -8,15 +8,14 @@ const DownloadByUrl = () => {
     const [loading, setLoading] = useState(false);
     const [progress, setProgress] = useState(0);
     const [error, setError] = useState("");
-    const [format, setFormat] = useState("mp3"); // New state for format
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [quality, setQuality] = useState('');
+    const [playingVideo, setPlayingVideo] = useState(null);
+    const [showPlayModal, setShowPlayModal] = useState(false);
+    const [selectedFormat, setSelectedFormat] = useState("mp4");
+    
 
-
-    // const backendUrl = "http://localhost:5000"; // Ensure your backend is running
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-    // 🔍 Fetch Video Info by URL
+    // Fetch Video Info by URL
     const handleFetchVideo = async () => {
         if (!searchQuery) {
             alert("Please enter a YouTube URL!");
@@ -45,17 +44,17 @@ const DownloadByUrl = () => {
         }
     };
 
-    // 📥 Download Video by videoId
-    const handleDownload = async (videoId, format, quality) => {
+    // Download Video by videoId
+    const handleDownload = async (videoId, format) => {
         if (!videoId) {
             setError("Invalid video ID.");
             return;
         }
 
-        if (!format || !quality) {
-            setError("Please select both format and quality.");
-            return;
-        }
+        // if (!format) {
+        //     setError("Please select format");
+        //     return;
+        // }
 
         setLoading(true);
         setProgress(0);
@@ -64,7 +63,7 @@ const DownloadByUrl = () => {
             const response = await axios({
                 method: "GET",
                 url: `${backendUrl}/download`,
-                params: { videoId, format, quality }, // Include both format and quality
+                params: { videoId, format: selectedFormat},
                 responseType: "blob",
                 onDownloadProgress: (progressEvent) => {
                     const percentCompleted = Math.round(
@@ -88,7 +87,7 @@ const DownloadByUrl = () => {
             const link = document.createElement("a");
 
             link.href = downloadUrl;
-            link.setAttribute("download", `${video?.title || "video"}.${format}`);
+            link.setAttribute("download", `${video?.title || "video"}.${selectedFormat}`);
             document.body.appendChild(link);
             link.click();
             link.remove();
@@ -99,7 +98,6 @@ const DownloadByUrl = () => {
             console.error("Download Error:", error);
             setError("Error downloading video. Ensure the backend is working.");
         } finally {
-            // Reset progress and loading state
             setTimeout(() => {
                 setProgress(0);
                 setLoading(false);
@@ -125,14 +123,14 @@ const DownloadByUrl = () => {
             <div className="pt-24 flex flex-col items-center p-8">
                 <h1 className="text-4xl font-bold mb-8">YouTube Video Downloader</h1>
 
-                {/* 🔎 URL Input */}
+                {/* URL Input */}
                 <div className="flex items-center mb-8 w-full max-w-xl">
                     <input
                         type="text"
                         placeholder="Enter YouTube URL..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleFetchVideo()} // Trigger search on Enter
+                        onKeyDown={(e) => e.key === "Enter" && handleFetchVideo()}
                         className="flex-grow p-3 rounded-l-lg bg-gray-800 text-white outline-none"
                     />
                     <button
@@ -143,10 +141,10 @@ const DownloadByUrl = () => {
                     </button>
                 </div>
 
-                {/* ❌ Error Message */}
+                {/* Error Message */}
                 {error && <p className="text-red-400">{error}</p>}
 
-                {/* 🎥 Video Preview */}
+                {/* Video Preview */}
                 {video && (
                     <div className="bg-gray-800 p-4 rounded-lg max-w-lg">
                         <img
@@ -157,102 +155,26 @@ const DownloadByUrl = () => {
                         <div className="mt-4 flex justify-center">
                             <h2 className="mt-4 font-semibold">{video.title}</h2>
                         </div>
-                        <div className="mt-4 flex justify-center gap-4">
-                            <button
-                                onClick={() => setIsModalOpen(true)}
-                                className="px-6 py-2 bg-red-500 hover:bg-red-600 rounded-lg"
-                            >
-                                Select Format
-                            </button>
-                        </div>
+
+                        {/* Format Selection Buttons */}
+                        <div className="flex gap-2 mt-4 ml-12">
+                <button onClick={() => setSelectedFormat("mp3")} className={`px-4 py-4 rounded transition ${selectedFormat === "mp3" ? "bg-blue-600" : "bg-gray-600 hover:bg-gray-700"}`}>MP3</button>
+                <button onClick={() => setSelectedFormat("mp4")} className={`px-4 py-4 rounded transition ${selectedFormat === "mp4" ? "bg-blue-600" : "bg-gray-600 hover:bg-gray-700"}`}>MP4</button>
+                <button onClick={() => handleDownload(video.videoId)} className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded transition">📥 Download</button>
+                <button onClick={() => { setPlayingVideo(video.videoId); setShowPlayModal(true); }} className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded transition">▶ Play</button>
+              </div>
                     </div>
                 )}
 
-                {/* Format Selection Modal */}
-                {isModalOpen && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                        <div className="bg-gray-800 p-6 rounded-lg max-w-md w-full">
-                            <h2 className="text-xl mb-4 text-white">Select Download Format</h2>
-
-                            {/* Format Selection Buttons */}
-                            <div className="flex gap-4 mb-4">
-                                <button
-                                    onClick={() => setFormat('mp3')}
-                                    className={`px-4 py-2 rounded-lg ${format === 'mp3' ? 'bg-red-500' : 'bg-gray-600'} hover:bg-red-600 text-white`}
-                                >
-                                    MP3
-                                </button>
-                                <button
-                                    onClick={() => setFormat('mp4')}
-                                    className={`px-4 py-2 rounded-lg ${format === 'mp4' ? 'bg-red-500' : 'bg-gray-600'} hover:bg-red-600 text-white`}
-                                >
-                                    MP4
-                                </button>
-                            </div>
-
-                            {/* Quality Selection Based on Format */}
-                            {format === 'mp3' && (
-                                <div className="flex gap-4 mb-4">
-                                    <button
-                                        onClick={() => setQuality('256kbps')}
-                                        className={`px-4 py-2 rounded-lg ${quality === '256kbps' ? 'bg-blue-500' : 'bg-gray-600'} hover:bg-blue-600 text-white`}
-                                    >
-                                        256 kbps
-                                    </button>
-                                    <button
-                                        onClick={() => setQuality('320kbps')}
-                                        className={`px-4 py-2 rounded-lg ${quality === '320kbps' ? 'bg-blue-500' : 'bg-gray-600'} hover:bg-blue-600 text-white`}
-                                    >
-                                        320 kbps
-                                    </button>
-                                </div>
-                            )}
-
-                            {format === 'mp4' && (
-                                <div className="flex gap-4 mb-4">
-                                    <button
-                                        onClick={() => setQuality('720p')}
-                                        className={`px-4 py-2 rounded-lg ${quality === '720p' ? 'bg-blue-500' : 'bg-gray-600'} hover:bg-blue-600 text-white`}
-                                    >
-                                        720p
-                                    </button>
-                                    <button
-                                        onClick={() => setQuality('1080p')}
-                                        className={`px-4 py-2 rounded-lg ${quality === '1080p' ? 'bg-blue-500' : 'bg-gray-600'} hover:bg-blue-600 text-white`}
-                                    >
-                                        1080p
-                                    </button>
-                                </div>
-                            )}
-
-                            {/* Action Buttons */}
-                            <div className="mt-4 flex justify-end gap-4">
-                                <button
-                                    onClick={() => setIsModalOpen(false)}
-                                    className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        handleDownload(video.videoId, format, quality);
-                                        setIsModalOpen(false);
-                                    }}
-                                    disabled={!format || !quality}
-                                    className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white"
-                                >
-                                    Download
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-
-                {/* ℹ️ Info Message */}
-                {!loading && !error && !video && (
-                    <p className="mt-8">Enter a YouTube URL to fetch and download the video!</p>
-                )}
+                {/* Video Modal */}
+                {showPlayModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-gray-800 p-6 rounded-lg max-w-2xl w-full relative">
+            <button className="absolute top-2 right-2 text-white bg-red-600 px-3 py-1 rounded" onClick={() => setShowPlayModal(false)}>X</button>
+            <iframe width="100%" height="400" src={`https://www.youtube.com/embed/${playingVideo}`} frameBorder="0" allowFullScreen className="rounded-lg"></iframe>
+          </div>
+        </div>
+      )}
             </div>
         </div>
     );
