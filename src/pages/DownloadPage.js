@@ -6,14 +6,12 @@ const DownloadPage = () => {
   const [query, setQuery] = useState("");
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
   const [playingVideo, setPlayingVideo] = useState(null);
   const [showPlayModal, setShowPlayModal] = useState(false);
   const [selectedFormat, setSelectedFormat] = useState("mp4");
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-  // 🔍 Search Videos from Backend
   const handleSearch = async () => {
     if (!query) return alert("Please enter a search term!");
     try {
@@ -29,27 +27,19 @@ const DownloadPage = () => {
     }
   };
 
-  // 📥 Handle Download
   const handleDownload = async (video) => {
     const quality = "720p";
     setLoading(true);
-    setProgress(0);
     try {
       console.log("📥 Downloading:", video.title, selectedFormat, quality);
+
       const response = await axios({
         method: "GET",
         url: `${backendUrl}/download`,
         params: { videoId: video.videoId, format: selectedFormat, quality },
         responseType: "blob",
-        onDownloadProgress: (progressEvent) => {
-          if (progressEvent.lengthComputable) {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            setProgress(percentCompleted);
-          } else {
-            setProgress(-1); // Indeterminate state
-          }
-        },
       });
+
       console.log("✅ Download Complete!");
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
@@ -62,10 +52,7 @@ const DownloadPage = () => {
       console.error("❌ Download Error:", error);
       setError("Failed to download video.");
     } finally {
-      setTimeout(() => {
-        setProgress(100);
-        setLoading(false);
-      }, 500);
+      setLoading(false);
     }
   };
 
@@ -77,7 +64,7 @@ const DownloadPage = () => {
           <div className="relative">
             <div className="w-32 h-32 border-8 border-transparent border-t-blue-500 border-b-blue-500 rounded-full animate-spin"></div>
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-white text-xl font-semibold animate-pulse">Loading...{progress}%</span>
+              <span className="text-white text-xl font-semibold animate-pulse">Loading...</span>
             </div>
           </div>
         </div>

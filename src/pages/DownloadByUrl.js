@@ -11,7 +11,6 @@ const DownloadByUrl = () => {
     const [playingVideo, setPlayingVideo] = useState(null);
     const [showPlayModal, setShowPlayModal] = useState(false);
     const [selectedFormat, setSelectedFormat] = useState("mp4");
-    
 
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -44,34 +43,37 @@ const DownloadByUrl = () => {
         }
     };
 
-    // Download Video by videoId
+    // Download Video by videoId and track progress
     const handleDownload = async (videoId, format) => {
         if (!videoId) {
             setError("Invalid video ID.");
             return;
         }
 
-        // if (!format) {
-        //     setError("Please select format");
-        //     return;
-        // }
-
         setLoading(true);
         setProgress(0);
 
         try {
+            // Open SSE connection to track download progress
+            const eventSource = new EventSource(`${backendUrl}/download/progress?videoId=${videoId}`);
+
+            // Update progress as it comes in
+            eventSource.onmessage = (event) => {
+                const progressData = JSON.parse(event.data);
+                if (progressData && progressData.progress) {
+                    setProgress(progressData.progress);  // Update progress
+                }
+            };
+
             const response = await axios({
                 method: "GET",
                 url: `${backendUrl}/download`,
-                params: { videoId, format: selectedFormat},
+                params: { videoId, format: selectedFormat },
                 responseType: "blob",
-                onDownloadProgress: (progressEvent) => {
-                    const percentCompleted = Math.round(
-                        (progressEvent.loaded * 100) / (progressEvent.total || 1)
-                    );
-                    setProgress(percentCompleted);
-                },
             });
+
+            // Close SSE connection after download is complete
+            eventSource.close();
 
             if (response.status !== 200) {
                 throw new Error(`Download failed with status ${response.status}`);
@@ -115,11 +117,12 @@ const DownloadByUrl = () => {
                     <div className="relative">
                         <div className="w-32 h-32 border-8 border-transparent border-t-blue-500 border-b-blue-500 rounded-full animate-spin"></div>
                         <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="text-white text-xl font-semibold animate-pulse">Loading...</span>
+                            <span className="text-white text-xl font-semibold animate-pulse">Loading... {progress}%</span>
                         </div>
                     </div>
                 </div>
             )}
+
             <div className="pt-24 flex flex-col items-center p-8">
                 <h1 className="text-4xl font-bold mb-8">YouTube Video Downloader</h1>
 
@@ -158,23 +161,58 @@ const DownloadByUrl = () => {
 
                         {/* Format Selection Buttons */}
                         <div className="flex gap-2 mt-4 ml-12">
-                <button onClick={() => setSelectedFormat("mp3")} className={`px-4 py-4 rounded transition ${selectedFormat === "mp3" ? "bg-blue-600" : "bg-gray-600 hover:bg-gray-700"}`}>MP3</button>
-                <button onClick={() => setSelectedFormat("mp4")} className={`px-4 py-4 rounded transition ${selectedFormat === "mp4" ? "bg-blue-600" : "bg-gray-600 hover:bg-gray-700"}`}>MP4</button>
-                <button onClick={() => handleDownload(video.videoId)} className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded transition">📥 Download</button>
-                <button onClick={() => { setPlayingVideo(video.videoId); setShowPlayModal(true); }} className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded transition">▶ Play</button>
-              </div>
+                            <button
+                                onClick={() => setSelectedFormat("mp3")}
+                                className={`px-4 py-4 rounded transition ${selectedFormat === "mp3" ? "bg-blue-600" : "bg-gray-600 hover:bg-gray-700"}`}
+                            >
+                                MP3
+                            </button>
+                            <button
+                                onClick={() => setSelectedFormat("mp4")}
+                                className={`px-4 py-4 rounded transition ${selectedFormat === "mp4" ? "bg-blue-600" : "bg-gray-600 hover:bg-gray-700"}`}
+                            >
+                                MP4
+                            </button>
+                            <button
+                                onClick={() => handleDownload(video.videoId)}
+                                className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded transition"
+                            >
+                                📥 Download
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setPlayingVideo(video.videoId);
+                                    setShowPlayModal(true);
+                                }}
+                                className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded transition"
+                            >
+                                ▶ Play
+                            </button>
+                        </div>
                     </div>
                 )}
 
                 {/* Video Modal */}
                 {showPlayModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-gray-800 p-6 rounded-lg max-w-2xl w-full relative">
-            <button className="absolute top-2 right-2 text-white bg-red-600 px-3 py-1 rounded" onClick={() => setShowPlayModal(false)}>X</button>
-            <iframe width="100%" height="400" src={`https://www.youtube.com/embed/${playingVideo}`} frameBorder="0" allowFullScreen className="rounded-lg"></iframe>
-          </div>
-        </div>
-      )}
+                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                        <div className="bg-gray-800 p-6 rounded-lg max-w-2xl w-full relative">
+                            <button
+                                className="absolute top-2 right-2 text-white bg-red-600 px-3 py-1 rounded"
+                                onClick={() => setShowPlayModal(false)}
+                            >
+                                X
+                            </button>
+                            <iframe
+                                width="100%"
+                                height="400"
+                                src={`https://www.youtube.com/embed/${playingVideo}`}
+                                frameBorder="0"
+                                allowFullScreen
+                                className="rounded-lg"
+                            ></iframe>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
