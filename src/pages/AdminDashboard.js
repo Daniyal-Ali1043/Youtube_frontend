@@ -213,193 +213,197 @@ export default function AdminDashboard() {
 
     return (
         <>
-            <nav className="fixed top-0 left-0 right-0 p-4 flex justify-between items-center bg-gray-900 shadow-lg z-50">
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-white flex items-center">
-                    <span className="text-red-500 text-4xl mr-2">▶</span> YouTube Downloader
-                </h1>
-                <button
-                    className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-xl"
-                    onClick={handleLogout}
-                >
-                    Logout
-                </button>
-            </nav>
-            <div className="min-h-screen bg-[#0f172a] text-white p-8">
-                <header className="mt-16 flex items-center justify-center mb-4">
+            <nav className="fixed top-0 left-0 right-0 px-4 py-3 sm:px-6 flex flex-wrap sm:flex-nowrap justify-between items-center bg-gray-900 shadow-lg z-50">
+    <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white flex items-center w-full sm:w-auto justify-center sm:justify-start mb-2 sm:mb-0">
+        <span className="text-red-500 text-3xl sm:text-4xl mr-2">▶</span>
+        YouTube Downloader
+    </h1>
 
-                    <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+    <div className="w-full sm:w-auto flex justify-center sm:justify-end">
+        <button
+            className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-xl text-sm sm:text-base"
+            onClick={handleLogout}
+        >
+            Logout
+        </button>
+    </div>
+</nav>
 
-                </header>
-                <div className="flex justify-end">
-                    <div className="flex justify-end">
-                        <button
-                            className="mb-4 mt-4 bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-xl transition duration-300 ease-in-out transform hover:scale-105"
-                            onClick={() => {
-                                fetchSearchCount();
-                                fetchDownloadCount();
-                                fetchFormatDistribution(); // Refresh format distribution data
-                                fetchQualityDistribution();
-                                fetchTopSearchQueries();
+<div className="min-h-screen bg-[#0f172a] text-white px-4 sm:px-6 md:px-8 py-6">
+    {/* Header */}
+    <header className="mt-20 flex items-center justify-center mb-6">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center">
+            Admin Dashboard
+        </h1>
+    </header>
 
-                            }}
-                        >
-                            Refresh Data
+    {/* Refresh Button */}
+    <div className="flex justify-center sm:justify-end mb-6">
+        <button
+            className="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-xl transition duration-300 ease-in-out transform hover:scale-105 text-sm sm:text-base"
+            onClick={() => {
+                fetchSearchCount();
+                fetchDownloadCount();
+                fetchFormatDistribution();
+                fetchQualityDistribution();
+                fetchTopSearchQueries();
+            }}
+        >
+            Refresh Data
+        </button>
+    </div>
+
+    {/* Dashboard Cards Grid */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Total Downloads */}
+        <Card className="bg-[#1e293b] text-white">
+            <CardContent className="flex flex-col p-4 sm:p-6">
+                <div className="flex items-center gap-4">
+                    <Download size={36} className="text-red-400" />
+                    <div>
+                        <h2 className="text-base sm:text-lg">Total Downloads</h2>
+                        <p className="text-3xl sm:text-4xl font-bold">{totalDownloads}</p>
+                        <button onClick={fetchAllDownloads} className="text-blue-400 text-sm sm:text-base mt-1">
+                            View all downloads →
                         </button>
                     </div>
-
                 </div>
+            </CardContent>
+        </Card>
 
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {/* Total Downloads */}
-                    <Card className="bg-[#1e293b] text-white">
-                        <CardContent className="flex flex-col p-6">
-                            <div className="flex items-center gap-4">
-                                <Download size={40} className="text-red-400" />
-                                <div>
-                                    <h2 className="text-lg">Total Downloads</h2>
-                                    <p className="text-4xl font-bold">{totalDownloads}</p>
-                                    <button onClick={fetchAllDownloads} className="text-blue-400">
-                                        View all downloads →</button>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Total Searches */}
-                    <Card className="bg-[#1e293b] text-white">
-                        <CardContent className="flex flex-col p-6">
-                            <div className="flex items-center gap-4">
-                                <Search size={40} className="text-blue-400" />
-                                <div>
-                                    <h2 className="text-lg">Total Searches</h2>
-                                    <p className="text-4xl font-bold">{totalSearches}</p>
-                                    <button onClick={fetchAllSearches} className="text-blue-400">
-                                        View all searches →</button>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Format Distribution */}
-                    <Card className="bg-[#1e293b] text-white">
-                        <CardContent className="flex flex-col p-6">
-                            <div className="flex items-center gap-4">
-                                <BarChart3 size={40} className="text-yellow-400" />
-                                <div>
-                                    <h2 className="text-lg">Format Distribution</h2>
-                                    <p className="text-1xl font-bold mt-4">🎵 {mp3Count} MP3 &nbsp; 📹 {mp4Count} MP4</p>
-
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                    <Card className="bg-[#1e293b] text-white">
-                        <h2 className="text-2xl font-bold">Download By Format</h2>
-                        <CardContent className="flex flex-col p-8">
-                            <div className="flex items-center ml-24 gap-4">
-
-                                {/* Pie Chart */}
-                                <div className="mt-4">
-                                    <Pie data={pieChartData} />
-                                </div>
-                            </div>
-
-                        </CardContent>
-                    </Card>
-
-                    <Card className="bg-[#1e293b] text-white">
-                        <h2 className="text-2xl font-bold">Download By Quality</h2>
-                        <CardContent className="flex flex-col p-8">
-                            <div className="flex items-center ml-24 gap-4">
-                                <div className="mt-4">
-                                    <Pie data={pieChartQualityData} />
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                <div className="grid grid-cols-1  gap- mt-6">
-                    <Card className="bg-[#1e293b] text-white shadow-lg rounded-lg">
-                        <CardContent className="flex flex-col p-6">
-                            <h2 className="text-xl font-semibold text-center mb-6">Top Search Query</h2>
-
-                            <table className="w-full border-collapse">
-                                <thead>
-                                    <tr className="border-b border-gray-600">
-                                        <th className="text-left p-2">Title</th>
-                                        <th className="text-right p-2">Count</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {topSearchQueries && topSearchQueries.length > 0 ? (
-                                        topSearchQueries.map((query, index) => (
-                                            <tr key={index} className="border-b border-gray-700">
-                                                <td className="p-2">{query.title}</td>
-                                                <td className="text-right p-2">{query.count}</td>
-                                            </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan="2" className="text-center p-4">No search queries available.</td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </CardContent>
-                    </Card>
-                </div>
-                <h2 className="text-2xl font-bold px-4 py-4 text-center mt-4">
-                    Client Distribution
-                </h2>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-2 px-4 py-4">
-                    {/* Mobile Card */}
-                    <Card className="bg-[#1e293b] text-white shadow-lg rounded-lg hover:scale-105 transition-transform">
-                        <CardContent className="flex flex-col p-6 items-center">
-                            <h3 className="text-lg font-semibold">Mobile Users</h3>
-                            <p className="text-4xl mt-4">{deviceCounts.mobile}</p>
-                        </CardContent>
-                    </Card>
-
-                    {/* Desktop Card */}
-                    <Card className="bg-[#1e293b] text-white shadow-lg rounded-lg hover:scale-105 transition-transform">
-                        <CardContent className="flex flex-col p-6 items-center">
-                            <h3 className="text-lg font-semibold">Desktop Users</h3>
-                            <p className="text-4xl mt-4">{deviceCounts.desktop}</p>
-                        </CardContent>
-                    </Card>
-
-                    {/* Other Card */}
-                    <Card className="bg-[#1e293b] text-white shadow-lg rounded-lg hover:scale-105 transition-transform">
-                        <CardContent className="flex flex-col p-6 items-center">
-                            <h3 className="text-lg font-semibold">Other Devices</h3>
-                            <p className="text-4xl mt-4">{deviceCounts.other}</p>
-                        </CardContent>
-                    </Card>
-                </div>
-
-
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-4">
-                    {/* Total Downloads */}
-                    <Card className="bg-[#1e293b] text-white hover:bg-gray-700 hover:scale-105 transition-transform duration-300 cursor-pointer">
-                        <button onClick={fetchAllDownloads} className="w-full h-full text-left">
-                            <CardContent className="flex flex-col p-6">
-                                <div className="flex items-center gap-4">
-                                    <Download size={40} className="text-red-400" />
-                                    <div>
-                                        <h2 className="text-lg">Manage Downloads</h2>
-                                        <p className="text-4xl font-bold">{totalDownloads}</p>
-                                    </div>
-                                </div>
-                            </CardContent>
+        {/* Total Searches */}
+        <Card className="bg-[#1e293b] text-white">
+            <CardContent className="flex flex-col p-4 sm:p-6">
+                <div className="flex items-center gap-4">
+                    <Search size={36} className="text-blue-400" />
+                    <div>
+                        <h2 className="text-base sm:text-lg">Total Searches</h2>
+                        <p className="text-3xl sm:text-4xl font-bold">{totalSearches}</p>
+                        <button onClick={fetchAllSearches} className="text-blue-400 text-sm sm:text-base mt-1">
+                            View all searches →
                         </button>
-                    </Card>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+
+        {/* Format Distribution */}
+        <Card className="bg-[#1e293b] text-white">
+            <CardContent className="flex flex-col p-4 sm:p-6">
+                <div className="flex items-center gap-4">
+                    <BarChart3 size={36} className="text-yellow-400" />
+                    <div>
+                        <h2 className="text-base sm:text-lg">Format Distribution</h2>
+                        <p className="text-lg sm:text-xl font-bold mt-3">
+                            🎵 {mp3Count} MP3 &nbsp; 📹 {mp4Count} MP4
+                        </p>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+  {/* Download By Format */}
+  <Card className="bg-[#1e293b] text-white">
+    <h2 className="text-xl sm:text-2xl font-bold text-center mt-4">
+      Download By Format
+    </h2>
+    <CardContent className="flex flex-col items-center justify-center p-4 sm:p-6 md:p-8">
+      <div className="w-full flex justify-center mt-4">
+        <div className="w-[200px] sm:w-[250px] md:w-[300px]">
+          <Pie data={pieChartData} />
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+
+  {/* Download By Quality */}
+  <Card className="bg-[#1e293b] text-white">
+    <h2 className="text-xl sm:text-2xl font-bold text-center mt-4">
+      Download By Quality
+    </h2>
+    <CardContent className="flex flex-col items-center justify-center p-4 sm:p-6 md:p-8">
+      <div className="w-full flex justify-center mt-4">
+        <div className="w-[200px] sm:w-[250px] md:w-[300px]">
+          <Pie data={pieChartQualityData} />
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+</div>
+
+                {/* Top Search Query Section */}
+<div className="grid grid-cols-1 gap-6 mt-6 px-4">
+  <Card className="bg-[#1e293b] text-white shadow-lg rounded-lg overflow-x-auto">
+    <CardContent className="flex flex-col p-4 sm:p-6">
+      <h2 className="text-xl sm:text-2xl font-semibold text-center mb-6">
+        Top Search Query
+      </h2>
+
+      <div className="w-full overflow-x-auto">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="border-b border-gray-600">
+              <th className="text-left p-2">Title</th>
+              <th className="text-right p-2">Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            {topSearchQueries && topSearchQueries.length > 0 ? (
+              topSearchQueries.map((query, index) => (
+                <tr key={index} className="border-b border-gray-700">
+                  <td className="p-2">{query.title}</td>
+                  <td className="text-right p-2">{query.count}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="2" className="text-center p-4">No search queries available.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </CardContent>
+  </Card>
+</div>
+
+{/* Client Distribution Header */}
+<h2 className="text-xl sm:text-2xl font-bold px-4 py-4 text-center mt-4">
+  Client Distribution
+</h2>
+
+{/* Client Distribution Cards */}
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-4 py-4">
+  {[
+    { label: "Mobile Users", value: deviceCounts.mobile },
+    { label: "Desktop Users", value: deviceCounts.desktop },
+    { label: "Other Devices", value: deviceCounts.other },
+  ].map(({ label, value }, idx) => (
+    <Card key={idx} className="bg-[#1e293b] text-white shadow-lg rounded-lg hover:scale-105 transition-transform">
+      <CardContent className="flex flex-col p-6 items-center text-center">
+        <h3 className="text-lg font-semibold">{label}</h3>
+        <p className="text-4xl mt-4">{value}</p>
+      </CardContent>
+    </Card>
+  ))}
+</div>
+
+{/* Manage Downloads */}
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4 px-4">
+  <Card className="bg-[#1e293b] text-white hover:bg-gray-700 hover:scale-105 transition-transform duration-300 cursor-pointer">
+    <button onClick={fetchAllDownloads} className="w-full h-full text-left">
+      <CardContent className="flex flex-col p-4 sm:p-6">
+        <div className="flex items-center gap-4">
+          <Download size={40} className="text-red-400" />
+          <div>
+            <h2 className="text-lg">Manage Downloads</h2>
+            <p className="text-4xl font-bold">{totalDownloads}</p>
+          </div>
+        </div>
+      </CardContent>
+    </button>
+  </Card>
 
 
                     {/* Total Searches */}
